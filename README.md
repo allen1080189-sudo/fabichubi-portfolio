@@ -1,2 +1,2 @@
-# fibichubi-pictures
-collect fabi's cute picture
+# pictures
+collect cute picture

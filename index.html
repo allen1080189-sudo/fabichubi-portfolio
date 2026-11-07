@@ -1,0 +1,299 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的自由作品集 | Portfolio & Downloader</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans">
+
+  <!-- 頂部導覽列 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="folder-git-2" class="w-6 h-6 text-indigo-600"></i>
+        <span class="font-bold text-lg text-slate-900 tracking-tight">OpenPortfolio</span>
+      </div>
+      <button id="openUploadBtn" class="inline-flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-sm">
+        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+        <span>上傳作品</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero 區域 -->
+  <section class="max-w-6xl mx-auto px-4 pt-12 pb-6 text-center">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">作品探索與分享空間</h1>
+    <p class="text-slate-600 max-w-xl mx-auto text-sm sm:text-base">
+      這裡收錄了所有設計、程式專案與研究文件。你可以隨意下載感興趣的成果，或在瀏覽器端上傳新作品進行展示！
+    </p>
+
+    <!-- 搜尋與篩選 -->
+    <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center items-center">
+      <div class="relative w-full sm:w-80">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+        <input type="text" id="searchInput" placeholder="搜尋作品名稱或標籤..." class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <!-- 分類標籤按鈕 -->
+      <div class="flex flex-wrap gap-1.5 justify-center" id="categoryFilters">
+        <button class="filter-btn active px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white" data-category="全部">全部</button>
+        <button class="filter-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-category="UI設計">UI設計</button>
+        <button class="filter-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-category="程式專案">程式專案</button>
+        <button class="filter-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100" data-category="簡報文件">簡報文件</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 作品網格展示區 -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full">
+    <div id="projectsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- 卡片由 JavaScript 動態渲染 -->
+    </div>
+    <!-- 空狀態提示 -->
+    <div id="emptyState" class="hidden text-center py-16">
+      <i data-lucide="inbox" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+      <p class="text-slate-500 font-medium">找不到符合條件的作品</p>
+    </div>
+  </main>
+
+  <!-- 上傳作品彈窗 Modal -->
+  <div id="uploadModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative animate-fade-in">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <h3 class="font-bold text-lg text-slate-900 flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i>
+          <span>新增作品卡片</span>
+        </h3>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="uploadForm" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">作品名稱 *</label>
+          <input type="text" id="projectTitle" required class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="例如：個人專案管理工具">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">作品分類</label>
+            <select id="projectCategory" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="程式專案">程式專案</option>
+              <option value="UI設計">UI設計</option>
+              <option value="簡報文件">簡報文件</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">標籤 (逗號分隔)</label>
+            <input type="text" id="projectTags" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Vue, Tailwind">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">作品簡述</label>
+          <textarea id="projectDesc" rows="3" class="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="簡單說明這個作品的重點或功能..."></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">選取作品檔案 (提供訪客下載) *</label>
+          <input type="file" id="projectFile" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" id="cancelModalBtn" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+          <button type="submit" class="px-5 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm">發布作品</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+    <p>遵循 AGENTS.md 規範設計 · 部署於 GitHub Pages</p>
+  </footer>
+
+  <!-- 邏輯腳本 -->
+  <script>
+    // 預載的作品資料（符合 AGENTS.md 規範）
+    const defaultProjects = [
+      {
+        id: "p1",
+        title: "智能學習助理 (Demo)",
+        category: "程式專案",
+        description: "基於 LLM 打造的課堂輔助工具，支援講義問答與測驗自動生成。",
+        tags: ["Python", "AI", "API"],
+        date: "2026-10",
+        downloadFilename: "AI-Tutor-Overview.txt",
+        downloadContent: "感謝下載！這是【智能學習助理】的示範原始文件。"
+      },
+      {
+        id: "p2",
+        title: "極簡咖啡地圖 UI 概念稿",
+        category: "UI設計",
+        description: "以清新米白與深焙咖啡色為基調設計的不限時咖啡廳探索 App 介面。",
+        tags: ["Figma", "Mobile", "UI/UX"],
+        date: "2026-09",
+        downloadFilename: "Coffee-UI-Design.txt",
+        downloadContent: "感謝下載！這是【極簡咖啡地圖】的設計規格草案。"
+      },
+      {
+        id: "p3",
+        title: "期末簡報：AI 時代的軟體開發",
+        category: "簡報文件",
+        description: "探討從 Vibe Coding 到規範驅動開發 (Spec-Driven) 的趨勢與演進筆記。",
+        tags: ["Slides", "Summary"],
+        date: "2026-11",
+        downloadFilename: "Presentation-Notes.txt",
+        downloadContent: "感謝下載！這是【AI時代的軟體開發】簡報大綱內容。"
+      }
+    ];
+
+    // 從 localStorage 讀取或初始化
+    let projects = JSON.parse(localStorage.getItem('open_portfolio_projects')) || defaultProjects;
+    let currentCategory = '全部';
+    let searchQuery = '';
+
+    // 渲染卡片
+    function renderProjects() {
+      const grid = document.getElementById('projectsGrid');
+      const emptyState = document.getElementById('emptyState');
+      grid.innerHTML = '';
+
+      const filtered = projects.filter(p => {
+        const matchesCategory = currentCategory === '全部' || p.category === currentCategory;
+        const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              p.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        filtered.forEach(p => {
+          const card = document.createElement('div');
+          card.className = "bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200";
+          
+          const tagsHtml = p.tags.map(t => `<span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-md font-medium">#${t}</span>`).join(' ');
+
+          card.innerHTML = `
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700">${p.category}</span>
+                <span>${p.date}</span>
+              </div>
+              <h3 class="font-bold text-slate-900 text-base mb-2">${p.title}</h3>
+              <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed mb-4">${p.description}</p>
+              <div class="flex flex-wrap gap-1 mb-4">${tagsHtml}</div>
+            </div>
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span class="text-[11px] text-slate-400 truncate max-w-[150px]">${p.downloadFilename}</span>
+              <button onclick="downloadProject('${p.id}')" class="inline-flex items-center gap-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg transition">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>下載作品</span>
+              </button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+      }
+      lucide.createIcons();
+    }
+
+    // 下載功能觸發器
+    window.downloadProject = function(id) {
+      const p = projects.find(item => item.id === id);
+      if (!p) return;
+
+      let blob;
+      if (p.fileDataUrl) {
+        // 使用者上傳的自訂檔案
+        fetch(p.fileDataUrl)
+          .then(res => res.blob())
+          .then(b => triggerDownload(b, p.downloadFilename));
+      } else {
+        // 預設純文字內容
+        blob = new Blob([p.downloadContent || "示範檔案內容"], { type: 'text/plain;charset=utf-8' });
+        triggerDownload(blob, p.downloadFilename);
+      }
+    };
+
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Modal 控制
+    const modal = document.getElementById('uploadModal');
+    document.getElementById('openUploadBtn').onclick = () => modal.classList.remove('hidden');
+    document.getElementById('closeModalBtn').onclick = () => modal.classList.add('hidden');
+    document.getElementById('cancelModalBtn').onclick = () => modal.classList.add('hidden');
+
+    // 處理上傳送出
+    document.getElementById('uploadForm').onsubmit = function(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('projectFile');
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const newProject = {
+          id: 'p-' + Date.now(),
+          title: document.getElementById('projectTitle').value,
+          category: document.getElementById('projectCategory').value,
+          description: document.getElementById('projectDesc').value || '無說明',
+          tags: document.getElementById('projectTags').value.split(',').map(t => t.trim()).filter(Boolean),
+          date: new Date().toISOString().slice(0, 7),
+          downloadFilename: file.name,
+          fileDataUrl: evt.target.result
+        };
+
+        projects.unshift(newProject);
+        try {
+          localStorage.setItem('open_portfolio_projects', JSON.stringify(projects));
+        } catch (err) {
+          console.warn("本機儲存空間較大，卡片僅存於當前工作階段");
+        }
+
+        renderProjects();
+        modal.classList.add('hidden');
+        document.getElementById('uploadForm').reset();
+      };
+      reader.readAsDataURL(file);
+    };
+
+    // 搜尋與篩選事件監聽
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderProjects();
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.className = "filter-btn px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100";
+        });
+        btn.className = "filter-btn active px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white";
+        currentCategory = btn.dataset.category;
+        renderProjects();
+      });
+    });
+
+    // 初次載入
+    renderProjects();
+  </script>
+</body>
+</html>
